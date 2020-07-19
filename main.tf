@@ -132,7 +132,8 @@ resource "aws_s3_bucket" "aws-s3-test" {
   force_destroy = true
 
   provisioner  "local-exec" {
-    command = "wget https://github.com/Divyansh747/Terraform_AWS-task-2/blob/master/image-1.png"
+    command = "wget https://github.com/Divyansh747/Terraform_AWS-task-2/raw/master/image-1.png
+"
   }
 }
 
