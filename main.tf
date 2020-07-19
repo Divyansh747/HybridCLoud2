@@ -118,7 +118,7 @@ resource "null_resource"  "mount-efs" {
       "yum install amazon-efs-utils nfs-utils -y",
       "sudo mount -t efs ${aws_efs_file_system.test-efs.id}:/ /var/www/html",
       "sudo echo '${aws_efs_file_system.test-efs.id}:/ /var/www/html efs defaults,_netdev 0 0' >> /etc/fstab",
-      "sudo git clone https://github.com/Divyansh747/Terraform_AWS-task-2.git /var/www/html"
+      "sudo git clone https://github.com/Divyansh747/Terraform_AWS-task-2.git /var/www/html",
       "sudo su",
       "chmod 777 /var/www/html/index.html"
     ] 
