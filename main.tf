@@ -83,3 +83,45 @@ resource "aws_instance" "aws-os-1" {
     Name = "aws-os-1"
   }
 }
+
+#aws efs file system
+resource "aws_efs_file_system" "test-efs" {
+  depends_on     = [aws_instance.aws-os-1]
+  creation_token = "test-efs"
+
+  tags = {
+    Name = "test-efs"
+  }
+}
+
+#aws efs mount target
+resource "aws_efs_mount_target" "alpha" {
+  file_system_id  = "${aws_efs_file_system.test-efs.id}"
+  subnet_id       = aws_instance.aws-os-1.subnet_id
+  security_groups = ["${aws_security_group.ssh-http-1.id}"]
+  depends_on      = [aws_efs_file_system.test-efs]
+}
+
+#null resource for installing packages in EC2 machine
+resource "null_resource"  "mount-efs" {
+  depends_on = [aws_efs_mount_target.alpha]
+ 
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = tls_private_key.tls_key.private_key_pem
+    host        = aws_instance.aws-os-1.public_ip 
+  }
+  
+  provisioner "remote-exec" {
+    inline = [
+      "yum install amazon-efs-utils nfs-utils -y",
+      "sudo mount -t efs ${aws_efs_file_system.test-efs.id}:/ /var/www/html",
+      "sudo echo '${aws_efs_file_system.test-efs.id}:/ /var/www/html efs defaults,_netdev 0 0' >> /etc/fstab",
+      "sudo git clone https://github.com/Divyansh747/Terraform_AWS-task-2.git /var/www/html"
+      "sudo su",
+      "chmod 777 /var/www/html/index.html"
+    ] 
+  }
+}
+
