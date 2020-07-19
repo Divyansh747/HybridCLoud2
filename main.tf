@@ -125,3 +125,23 @@ resource "null_resource"  "mount-efs" {
   }
 }
 
+#aws s3 bucket
+resource "aws_s3_bucket" "aws-s3-test" {
+  depends_on = [null_resource.mount-efs]
+  bucket = "awstestbucket747"
+  acl    = "public-read"
+  force_destroy = true
+
+  provisioner  "local-exec" {
+    command = "wget https://github.com/Divyansh747/Terraform_AWS-task-2/blob/master/image-1.png"
+  }
+}
+
+#aws s3 bucket object
+resource "aws_s3_bucket_object" "object" {
+  depends_on = [aws_s3_bucket.aws-s3-test]
+  bucket = "awstestbucket747"
+  key    = "image-1.png"
+  source = "image-1.png"
+}
+	
